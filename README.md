@@ -1,2 +1,4 @@
-# typescript
+# TypeScript
 TypeScript Study
+
+# [1. 타입스크립트란?]()
