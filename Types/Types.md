@@ -298,3 +298,74 @@
       work: () => {},
   })
 ```
+
+## enum
+```typescript
+ /**
+ * Enum : not recommended in typescript -> Can be replaced by Union
+ */
+enum Days
+{
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday,
+}
+
+console.log(Days.Tuesday);
+const day = Days.Saturday;
+console.log(day);
+``
+
+## Type Inference
+```typescript
+/**
+ * Type Inference : not recommended
+ */
+let text = 'hello';
+function print(message = 'hello')   // return automatically string
+{
+    console.log(message);
+}
+print('hello');
+
+function add(x:number, y:number): number
+{
+    return x + y;
+}
+const result = add(1, 2);
+```
+
+## Type Assertion
+```typescript
+  /**
+   * Type Assertion
+   */
+  function jsStrFunc(): any
+  {
+      return 2;
+  }
+  const result = jsStrFunc();
+  console.log((result as string).length);
+  console.log((<string>result).length);
+
+  const wrong: any = 5;
+  console.log((wrong as Array<number>).push(1));
+
+  function findNumbers(): number[] | undefined
+  {
+      return undefined;
+  }
+  const numbers = findNumbers();
+  numbers.push(2);
+
+  const button = document.querySelector('class');
+  if(button)
+  {
+      button.nodeValue;
+  }
+}
+```
