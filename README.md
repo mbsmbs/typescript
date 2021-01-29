@@ -5,4 +5,4 @@ TypeScript Study
 
 # [2. Types](https://github.com/mbsmbs/typescript/blob/main/Types/Types.md)
 
-# [3. OOP]()
+# [3. OOP](https://github.com/mbsmbs/typescript/blob/main/OOP/OOP.md)
