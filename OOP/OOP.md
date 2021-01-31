@@ -677,8 +677,253 @@
         machine.makeCoffee(1);
     })
     
-} 
+}
+```
 
 ### Composition
-- 
+- 클래스들 사이에 서로 상호작용을 하는 경우에 클래스자신을 노출시키는게 아니라 계약서를 통해서 의사소통을 한다. 이 계약서는 바로 인터페이스이다.
+```typescript
+{
+    type CoffeeCup = {
+      shots: number;
+      hasMilk?: boolean;
+      hasSugar?: boolean;
+    };
+  
+    interface MilkFrother {
+      makeMilk(cup: CoffeeCup): CoffeeCup;
+    }
+  
+    interface SugarSource {
+      addSugar(cup: CoffeeCup): CoffeeCup;
+    }
+  
+    class CheapMilkSteamer implements MilkFrother {
+      makeMilk(cup: CoffeeCup): CoffeeCup {
+        console.log(`Steaming some milk🥛...`);
+        return {
+          ...cup,
+          hasMilk: true,
+        };
+      }
+    }
+  
+    class FancyMilkSteamer implements MilkFrother {
+      makeMilk(cup: CoffeeCup): CoffeeCup {
+        console.log(`Fancy!!!! Steaming some milk🥛...`);
+        return {
+          ...cup,
+          hasMilk: true,
+        };
+      }
+    }
+  
+    class AutomaticSugarMixer implements SugarSource {
+      addSugar(cuppa: CoffeeCup): CoffeeCup {
+        console.log(`Adding sugar...`);
+        return {
+          ...cuppa,
+          hasSugar: true,
+        };
+      }
+    }
+  
+    interface CoffeeMaker {
+      makeCoffee(shots: number): CoffeeCup;
+    }
+  
+    class CoffeeMachine implements CoffeeMaker {
+      private static BEANS_GRAMM_PER_SHOT: number = 7; // class level
+      private coffeeBeans: number = 0; // instance (object) level
+  
+      constructor(coffeeBeans: number) {
+        this.coffeeBeans = coffeeBeans;
+      }
+  
+      static makeMachine(coffeeBeans: number): CoffeeMachine {
+        return new CoffeeMachine(coffeeBeans);
+      }
+  
+      fillCoffeeBeans(beans: number) {
+        if (beans < 0) {
+          throw new Error('value for beans should be greater than 0');
+        }
+        this.coffeeBeans += beans;
+      }
+  
+      clean() {
+        console.log('cleaning the machine...🧼');
+      }
+  
+      private grindBeans(shots: number) {
+        console.log(`grinding beans for ${shots}`);
+        if (this.coffeeBeans < shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT) {
+          throw new Error('Not enough coffee beans!');
+        }
+        this.coffeeBeans -= shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT;
+      }
+  
+      private preheat(): void {
+        console.log('heating up... 🔥');
+      }
+  
+      private extract(shots: number): CoffeeCup {
+        console.log(`Pulling ${shots} shots... ☕️`);
+        return {
+          shots,
+          hasMilk: false,
+        };
+      }
+  
+      makeCoffee(shots: number): CoffeeCup {
+        this.grindBeans(shots);
+        this.preheat();
+        return this.extract(shots);
+      }
+    }
+  
+    class CaffeLatteMachine extends CoffeeMachine {
+      constructor(beans: number, public readonly serialNumber: string) {
+        super(beans);
+      }
+      private steamMilk(): void {
+        console.log('Steaming some milk... 🥛');
+      }
+      makeCoffee(shots: number): CoffeeCup {
+        const coffee = super.makeCoffee(shots);
+        this.steamMilk();
+        return {
+          ...coffee,
+          hasMilk: true,
+        };
+      }
+    }
+  
+    class SweetCoffeeMaker extends CoffeeMachine {
+      makeCoffee(shots: number): CoffeeCup {
+        const coffee = super.makeCoffee(shots);
+        return {
+          ...coffee,
+          hasSugar: true,
+        };
+      }
+    }
+  
+    class SweetCaffeLatteMachine extends CoffeeMachine {
+      constructor(
+        beans: number,
+        private sugar: SugarSource,
+        private milk: MilkFrother,
+      ) {
+        super(beans);
+      }
+      makeCoffee(shots: number): CoffeeCup {
+        const coffee = super.makeCoffee(shots);
+        const milkCoffee = this.milk.makeMilk(coffee);
+        return this.sugar.addSugar(milkCoffee);
+      }
+    }
+    const machine = new SweetCaffeLatteMachine(
+      32,
+      new AutomaticSugarMixer(),
+      new FancyMilkSteamer()
+    );
+    machine.makeCoffee(2);
+  }
+  
+```
+
+### Abstract Class
+- 개체를 생성할 수 없고
+- 구현은 자식 클래스에서
+```typescript
+{
+    type CoffeeCup = {
+      shots: number;
+      hasMilk?: boolean;
+      hasSugar?: boolean;
+    };
+  
+    interface CoffeeMaker {
+      makeCoffee(shots: number): CoffeeCup;
+    }
+  
+    abstract class CoffeeMachine implements CoffeeMaker {
+      private static BEANS_GRAMM_PER_SHOT: number = 7; // class level
+      private coffeeBeans: number = 0; // instance (object) level
+  
+      constructor(coffeeBeans: number) {
+        this.coffeeBeans = coffeeBeans;
+      }
+  
+      fillCoffeeBeans(beans: number) {
+        if (beans < 0) {
+          throw new Error('value for beans should be greater than 0');
+        }
+        this.coffeeBeans += beans;
+      }
+  
+      clean() {
+        console.log('cleaning the machine...🧼');
+      }
+  
+      private grindBeans(shots: number) {
+        console.log(`grinding beans for ${shots}`);
+        if (this.coffeeBeans < shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT) {
+          throw new Error('Not enough coffee beans!');
+        }
+        this.coffeeBeans -= shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT;
+      }
+  
+      private preheat(): void {
+        console.log('heating up... 🔥');
+      }
+  
+      protected abstract extract(shots: number): CoffeeCup;
+  
+      makeCoffee(shots: number): CoffeeCup {
+        this.grindBeans(shots);
+        this.preheat();
+        return this.extract(shots);
+      }
+    }
+  
+    class CaffeLatteMachine extends CoffeeMachine {
+      constructor(beans: number, public readonly serialNumber: string) {
+        super(beans);
+      }
+      private steamMilk(): void {
+        console.log('Steaming some milk... 🥛');
+      }
+  
+      protected extract(shots: number): CoffeeCup {
+        this.steamMilk();
+        return {
+          shots,
+          hasMilk: true,
+        };
+      }
+    }
+  
+    class SweetCoffeeMaker extends CoffeeMachine {
+      protected extract(shots: number): CoffeeCup {
+        return {
+          shots,
+          hasSugar: true,
+        };
+      }
+    }
+  
+    const machines: CoffeeMaker[] = [
+      new CaffeLatteMachine(16, '1'),
+      new SweetCoffeeMaker(16),
+      new CaffeLatteMachine(16, '1'),
+      new SweetCoffeeMaker(16),
+    ];
+    machines.forEach(machine => {
+      console.log('-------------------------');
+      machine.makeCoffee(1);
+    });
+  }
+  
 ```
