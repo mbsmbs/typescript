@@ -130,7 +130,7 @@
   const[name, age] = student;
 ```
 
-## Type Alises & String Literal Types
+## Type Aliases & String Literal Types
 ```typescript
   /**
    * Type Aliases
