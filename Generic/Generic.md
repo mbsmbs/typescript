@@ -16,7 +16,7 @@
 ```
 
 
-# Generic class
+# Generic Class
 ```typescript
 {
     interface Either<L, R>
@@ -45,5 +45,83 @@
     either.right();
 
     const best = new SimpleEither({name: 'Ellie'}, 'hello');
+}
+```
+
+# Constraints
+```typescript
+{
+    interface Employee
+    {
+        pay(): void;
+    }
+
+    class FullTimeEmployee implements Employee
+    {
+        pay()
+        {
+            console.log('Full Time!');
+        }
+
+        workFullTime()
+        {
+
+        }
+    }
+
+    class PartTimeEmployee implements Employee
+    {
+        pay()
+        {
+            console.log('Part Time!');
+        }
+
+        workPartTime()
+        {
+            
+        }
+    }
+
+    function payBad(employee: Employee): Employee
+    {
+        employee.pay();
+        return employee;
+    }
+
+    function payGood<T extends Employee>(employee: T): T
+    {
+        employee.pay();
+        return employee;
+    }
+
+    const steve = new FullTimeEmployee();
+    const jobs = new PartTimeEmployee();
+    steve.workFullTime();
+    jobs.workPartTime();
+
+    const steveAfterPay = payGood(steve);
+    const jobsAfterPay = payGood(jobs);
+
+    // ---------
+    const obj = 
+    {
+        name: 'steve',
+        age: 20, 
+    };
+
+    const obj2 =
+    {
+        animal: 'dog',
+    }
+
+    console.log(getValue(obj, 'name'));
+    console.log(getValue(obj, 'age'));
+    console.log(getValue(obj2, 'animal'));
+
+    function getValue<T, K extends keyof T>(obj: T, key: K): T[K]
+    {
+        return obj[key];
+    }
+    
 }
 ```
