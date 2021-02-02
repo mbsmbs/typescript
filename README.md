@@ -8,3 +8,5 @@ TypeScript Study
 # [3. OOP](https://github.com/mbsmbs/typescript/blob/main/OOP/OOP.md)
 
 # [4. Generic](https://github.com/mbsmbs/typescript/blob/main/Generic/Generic.md)
+
+# [5. Exception]()
